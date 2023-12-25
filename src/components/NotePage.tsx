@@ -1,12 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
+import axiosInstance from "../configs/axios";
+import { Input } from "antd";
 // import notes from '../assets/data.js'
 // import ArrowLeft from "../assets/arrow-left.svg";
 
 const NotePage = () => {
   let { id } = useParams();
   let navigate = useNavigate();
-  let [note, setNote] = useState<any>({});
+  let [note, setNote] = useState<{ title: string; content: string }>({
+    title: "",
+    content: "",
+  });
+
   useEffect(() => {
     let getNote = async () => {
       if (id === "new") return;
@@ -19,13 +25,15 @@ const NotePage = () => {
   }, [id]);
 
   let createNote = async () => {
-    await fetch(`/api/notes/create/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ ...note, updated: new Date() }),
-    });
+    // const newNote = await axiosInstance.post(`/notes`, {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify({ ...note }),
+    // });
+
+    console.log(note);
   };
 
   let updateNote = async () => {
@@ -46,7 +54,7 @@ const NotePage = () => {
   };
 
   let handleSubmit = () => {
-    if (id !== "new" && !note.body) {
+    if (id !== "new" && !note.title) {
       deleteNote();
     } else if (id !== "new") {
       updateNote();
@@ -60,12 +68,7 @@ const NotePage = () => {
     <div className="note">
       <div className="note-header">
         <h3>
-          <Link to="/">
-            {/* <ArrowLeft
-            // onClick={() => handleSubmit()}
-            /> */}
-            Back
-          </Link>
+          <Link to="/">Back</Link>
         </h3>
         {id !== "new" ? (
           <button onClick={deleteNote}>Delete</button>
@@ -74,11 +77,18 @@ const NotePage = () => {
         )}
       </div>
       <div className="note-body">
+        <Input
+          placeholder="Title"
+          value={note.title}
+          onChange={(e) => {
+            setNote({ ...note, title: e.target.value });
+          }}
+        />
         <textarea
           onChange={(e) => {
-            setNote({ ...note, body: e.target.value });
+            setNote({ ...note, content: e.target.value });
           }}
-          value={note.body}
+          value={note.content}
         ></textarea>
       </div>
     </div>
