@@ -4,20 +4,27 @@ import AddButton from "../components/AddButton.js";
 import axios from "axios";
 import axiosInstance from "../configs/axios.js";
 import { ResponseListModel } from "../interfaces/response.js";
+import { INote } from "../interfaces/note.js";
 
 const NotesListPage = () => {
-  let [notes, setNote] = useState([]);
+  let [notes, setNote] = useState<INote[]>([]);
 
   useEffect(() => {
     getNotes();
-  }, []); // fires once when the component is mounted
+  }, []);
 
   let getNotes = async () => {
-    let response = await axiosInstance.get<never, ResponseListModel<never>>(
-      "notes"
+    console.log("Fetch data");
+    let response = await axiosInstance.get<never, ResponseListModel<INote>>(
+      "notes?limit=100&offset=0"
     );
     let data = response.data;
     setNote(data?.data);
+  };
+
+  const onTriggerDeleteNote = (id: number) => {
+    const filteredNotes = notes.filter((note) => note.id !== id);
+    setNote(filteredNotes);
   };
 
   return (
@@ -30,7 +37,7 @@ const NotesListPage = () => {
         {notes?.map((note, index) => {
           return (
             <div className="note-preview" key={index}>
-              <ListItem note={note} />
+              <ListItem note={note} onDelete={onTriggerDeleteNote} />
             </div>
           );
         })}

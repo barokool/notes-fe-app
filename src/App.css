@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap");
 
 :root {
   --color-main: #f68657;
@@ -29,7 +29,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "Lexend", sans-serif;
+  font-family: "Montserrat", sans-serif;
   color: inherit;
   font-size: inherit;
   scroll-behavior: smooth;
@@ -131,17 +131,30 @@ a {
 .notes-list::-webkit-scrollbar {
   display: none;
 }
+.note-container {
+  display: flex;
+  padding: 8px 16px;
+  justify-content: center;
+  align-items: center;
+}
 
+.note-container:hover {
+  display: flex;
+  background-color: var(--color-bg);
+  cursor: pointer;
+}
 .notes-list-item {
+  width: 100%;
   border-bottom: 1px solid var(--color-border);
   margin-bottom: 12px;
   padding: 8px 16px;
   transition: all 0.2s ease-in-out;
 }
 
-.notes-list-item:hover {
-  background-color: var(--color-bg);
-  cursor: pointer;
+.notes-edit {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .notes-list-item h3,
@@ -216,12 +229,16 @@ a {
   cursor: pointer;
 }
 
+.note-body {
+  padding: 0 20px;
+}
+
 .note textarea {
   background-color: var(--color-white);
   border: none;
   padding: 16px 12px;
   width: 100%;
-  height: 70vh;
+  height: 100%;
   resize: none;
   scrollbar-width: none; /* Firefox */
 }

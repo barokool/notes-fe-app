@@ -1,9 +1,40 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, useNavigate, Link, redirect } from "react-router-dom";
 import axiosInstance from "../configs/axios";
 import { Input } from "antd";
-// import notes from '../assets/data.js'
-// import ArrowLeft from "../assets/arrow-left.svg";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import dayjs, { Dayjs } from "dayjs";
+import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
+import { makeStyles } from "@mui/styles";
+
+const useStyles = makeStyles((theme) => ({
+  dateTimePicker: {
+    "& .MuiInputLabel-root": {
+      color: "white", // Màu của label
+      fontWeight: "bold", // Độ đậm của label
+      "&.Mui-focused ": {
+        color: "white", // Màu của border khi focus
+      },
+    },
+    "& .MuiOutlinedInput-root": {
+      "& fieldset": {
+        borderColor: "white", // Màu của border
+      },
+      "&:hover fieldset": {
+        borderColor: "white", // Màu của border khi hover
+      },
+      "&.Mui-focused fieldset": {
+        borderColor: "white", // Màu của border khi focus
+      },
+    },
+    "& .MuiInputBase-input": {
+      color: "white",
+    },
+    "& .css-i4bv87-MuiSvgIcon-root": {
+      color: "white",
+    },
+  },
+}));
 
 const NotePage = () => {
   let { id } = useParams();
@@ -12,6 +43,8 @@ const NotePage = () => {
     title: "",
     content: "",
   });
+  const [value, setValue] = useState<Dayjs | null>(dayjs(new Date()));
+  const classes = useStyles();
 
   useEffect(() => {
     let getNote = async () => {
@@ -25,15 +58,11 @@ const NotePage = () => {
   }, [id]);
 
   let createNote = async () => {
-    // const newNote = await axiosInstance.post(`/notes`, {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify({ ...note }),
-    // });
-
-    console.log(note);
+    const newNote = await axiosInstance.post(`/notes`, {
+      ...note,
+      reminder: value,
+    });
+    return newNote;
   };
 
   let updateNote = async () => {
@@ -47,10 +76,7 @@ const NotePage = () => {
   };
 
   let deleteNote = async () => {
-    await fetch(`/api/notes/${id}/delete/`, {
-      method: "DELETE",
-    });
-    navigate("/");
+    await axiosInstance.delete(`/notes/${id}`);
   };
 
   let handleSubmit = () => {
@@ -61,7 +87,7 @@ const NotePage = () => {
     } else if (id === "new" && note !== null) {
       createNote();
     }
-    navigate("/");
+    window.location.replace("/");
   };
 
   return (
@@ -76,6 +102,20 @@ const NotePage = () => {
           <button onClick={handleSubmit}>Save</button>
         )}
       </div>
+
+      <DemoContainer components={["DateTimePicker", "DateTimePicker"]}>
+        <div style={{ padding: "10px 20px", width: "100%" }}>
+          <DateTimePicker
+            label="Reminder"
+            value={value}
+            onChange={(newValue) => {
+              console.log(newValue?.format("YYYY-MM-DD HH:mm:ss"));
+              setValue(newValue);
+            }}
+            className={classes.dateTimePicker}
+          />
+        </div>
+      </DemoContainer>
       <div className="note-body">
         <Input
           placeholder="Title"
@@ -83,12 +123,15 @@ const NotePage = () => {
           onChange={(e) => {
             setNote({ ...note, title: e.target.value });
           }}
+          style={{ marginTop: "20px" }}
         />
         <textarea
           onChange={(e) => {
             setNote({ ...note, content: e.target.value });
           }}
+          placeholder="Write your note here..."
           value={note.content}
+          style={{ marginTop: "20px" }}
         ></textarea>
       </div>
     </div>
